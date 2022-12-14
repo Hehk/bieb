@@ -1,59 +1,99 @@
 <script>
-	import Counter from './Counter.svelte';
-	import welcome from '$lib/images/svelte-welcome.webp';
-	import welcome_fallback from '$lib/images/svelte-welcome.png';
+	import Icon from '@iconify/svelte';
+
+	$: results = []
+	
+	const onSubmit = async (e) => {
+		const formData = new FormData(e.target)
+		const search = formData.get('search')
+		if (!search) return
+
+		console.log(search)
+		try {
+			const response = await fetch('http://localhost:8000/search', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({ query: search })
+			})
+			const json = await response.json()
+			results = json.results
+		} catch (e) {
+			console.error(e)
+		}
+	}
 </script>
 
 <svelte:head>
-	<title>Home</title>
-	<meta name="description" content="Svelte demo app" />
+	<title>Bieb</title>
+	<meta name="description" content="Search the world of open books!" />
 </svelte:head>
 
 <section>
-	<h1>
-		<span class="welcome">
-			<picture>
-				<source srcset={welcome} type="image/webp" />
-				<img src={welcome_fallback} alt="Welcome" />
-			</picture>
-		</span>
-
-		to your new<br />SvelteKit app
-	</h1>
-
-	<h2>
-		try editing <strong>src/routes/+page.svelte</strong>
-	</h2>
-
-	<Counter />
+	<form on:submit|preventDefault={onSubmit}>
+		<input type="text" name="search" id="search" />
+		<div class="search-icon">
+			<Icon icon="uil:search" />
+		</div>
+	</form>
+	
+	{#if results.length === 0}
+		<p>Search for a book</p>
+	{:else}
+		<h2>Results</h2>
+	{/if}
+	{#each results as result}
+		<p>{result}</p>
+	{/each}
+	
 </section>
 
 <style>
 	section {
+		padding: 0 4rem;
+	}
+
+	form {
+		width: 100%;
+		position: relative;
+
+		margin-top: 4rem;
+		margin-bottom: 2rem;
+	}
+	
+	form .search-icon {
+		position: absolute;
+		right: 1rem;
+		top: 1rem;
+		font-size: 1.5rem;
+		line-height: 1rem;
+	}
+
+	input {
+		width: 100%;
+		background-color: var(--color-bg);
+		font-size: 1rem;
+		outline: none;
+		border-radius: 0.25rem;
+		padding: 1rem;
+		padding-right: 2.75rem;
+		border: 2px solid var(--color-text);
+		box-shadow: 0px 0px 0 0 var(--color-text);
+		transition: box-shadow 0.25s ease, border-color 0.25s ease;
+	}
+	
+	input:focus {
+		box-shadow: 0.25rem 0.25rem 0 0 var(--color-theme-1);
+	}
+	
+	section {
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
-		align-items: center;
-		flex: 0.6;
 	}
 
-	h1 {
-		width: 100%;
-	}
-
-	.welcome {
-		display: block;
-		position: relative;
-		width: 100%;
-		height: 0;
-		padding: 0 0 calc(100% * 495 / 2048) 0;
-	}
-
-	.welcome img {
-		position: absolute;
-		width: 100%;
-		height: 100%;
-		top: 0;
-		display: block;
+	p {
+		text-align: left;
 	}
 </style>

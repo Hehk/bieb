@@ -1,33 +1,32 @@
-@import '@fontsource/fira-mono';
+@import url('@fontsource/lora');
+@import url('@fontsource/source-sans-pro');
+/* https://coolors.co/palette/f4f1de-e07a5f-3d405b-81b29a-f2cc8f */
 
 :root {
-	--font-body: Arial, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
+	--font-serif: 'Lora', serif;
+	--font-body: 'Source Sans Pro', Arial, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
 		Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-	--font-mono: 'Fira Mono', monospace;
-	--color-bg-0: rgb(202, 216, 228);
-	--color-bg-1: hsl(209, 36%, 86%);
-	--color-bg-2: hsl(224, 44%, 95%);
-	--color-theme-1: #ff3e00;
-	--color-theme-2: #4075a6;
-	--color-text: rgba(0, 0, 0, 0.7);
+	--color-bg: #f4f1de;
+	--color-theme-1: #e07a5f;
+	--color-theme-2: #81b29a;
+	--color-text: #3d405b;
 	--column-width: 42rem;
 	--column-margin-top: 4rem;
 	font-family: var(--font-body);
 	color: var(--color-text);
+	
+	--container-width: 48rem;
 }
 
 body {
 	min-height: 100vh;
 	margin: 0;
-	background-attachment: fixed;
-	background-color: var(--color-bg-1);
-	background-size: 100vw 100vh;
-	background-image: radial-gradient(
-			50% 50% at 50% 50%,
-			rgba(255, 255, 255, 0.75) 0%,
-			rgba(255, 255, 255, 0) 100%
-		),
-		linear-gradient(180deg, var(--color-bg-0) 0%, var(--color-bg-1) 15%, var(--color-bg-2) 50%);
+	background-color: var(--color-bg);
+	font-size: 16px;
+}
+
+* {
+	box-sizing: border-box;
 }
 
 h1,
@@ -41,41 +40,27 @@ p {
 }
 
 a {
-	color: var(--color-theme-1);
+	color: var(--color-text);
 	text-decoration: none;
 }
 
 a:hover {
 	text-decoration: underline;
+	text-decoration-color: var(--color-theme-2);
+	text-decoration-thickness: 4px;
+	text-underline-offset: 4px;
 }
 
 h1 {
 	font-size: 2rem;
 	text-align: center;
+	font-family: var(--font-serif);
 }
 
 h2 {
-	font-size: 1rem;
-}
-
-pre {
-	font-size: 16px;
-	font-family: var(--font-mono);
-	background-color: rgba(255, 255, 255, 0.45);
-	border-radius: 3px;
-	box-shadow: 2px 2px 6px rgb(255 255 255 / 25%);
-	padding: 0.5em;
-	overflow-x: auto;
-	color: var(--color-text);
-}
-
-.text-column {
-	display: flex;
-	max-width: 48rem;
-	flex: 0.6;
-	flex-direction: column;
-	justify-content: center;
-	margin: 0 auto;
+	font-size: 2rem;
+	font-weight: bold;
+	font-family: var(--font-serif);
 }
 
 input,
@@ -86,22 +71,4 @@ button {
 
 button:focus:not(:focus-visible) {
 	outline: none;
-}
-
-@media (min-width: 720px) {
-	h1 {
-		font-size: 2.4rem;
-	}
-}
-
-.visually-hidden {
-	border: 0;
-	clip: rect(0 0 0 0);
-	height: auto;
-	margin: 0;
-	overflow: hidden;
-	padding: 0;
-	position: absolute;
-	width: 1px;
-	white-space: nowrap;
 }

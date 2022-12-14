@@ -11,4 +11,7 @@ node_modules
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
+# Python
+env
+__pycache__
 books

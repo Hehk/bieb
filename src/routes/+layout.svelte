@@ -11,7 +11,7 @@
 	</main>
 
 	<footer>
-		<p>visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to learn SvelteKit</p>
+		<p>WIP – This is still under heavy development</p>
 	</footer>
 </div>
 
@@ -26,9 +26,9 @@
 		flex: 1;
 		display: flex;
 		flex-direction: column;
-		padding: 1rem;
+
 		width: 100%;
-		max-width: 64rem;
+		max-width: var(--container-width);
 		margin: 0 auto;
 		box-sizing: border-box;
 	}
@@ -41,13 +41,9 @@
 		padding: 12px;
 	}
 
-	footer a {
-		font-weight: bold;
-	}
-
 	@media (min-width: 480px) {
 		footer {
-			padding: 12px 0;
+			padding: 1rem 0;
 		}
 	}
 </style>
