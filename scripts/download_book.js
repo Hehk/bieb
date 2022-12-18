@@ -4,6 +4,7 @@ import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import fetch from 'node-fetch';
 import fs from 'fs';
+import parser from '../src/lib/book_parser.mjs';
 
 yargs(hideBin(process.argv))
 	.command({
@@ -29,26 +30,27 @@ yargs(hideBin(process.argv))
 	})
 	.help().argv;
 
-function removeEnd(str) {
-	const indexOfEnd = str.lastIndexOf('*** END OF THE PROJECT GUTENBERG');
-	return str.slice(0, indexOfEnd);
-}
-
-function removeStart(str) {
-	const regex = /(\*\*\* START OF THE PROJECT GUTENBERG EBOOK .+ \*\*\*)/g;
-	const endOfStart = str.search(regex) + regex.exec(str)[0].length;
-	return str.slice(endOfStart);
+async function downloadEpub(book) {
+	const link = book.formats['application/epub+zip'];
+	const content = await fetch(link);
+	console.log(await content.body());
 }
 
 async function downloadBook(bookId) {
 	try {
-		const response = await fetch(`http://gutendex.com/books/${bookId}`);
+		const url = `http://gutendex.com/books/${bookId}`;
+		const response = await fetch(url);
 		const book = await response.json();
-		const downloadLink = book.formats['text/plain; charset=utf-8'];
+		const downloadLink =
+			book.formats['text/plain; charset=utf-8'] ||
+			book.formats['text/plain;'] ||
+			book.formats['text/plain; charset=us-ascii'] ||
+			book.formats['text/plain'];
 
 		const downloadResponse = await fetch(downloadLink);
 		const text = await downloadResponse.text();
-		fs.writeFile(`./books/${bookId}.txt`, removeStart(removeEnd(text)).trim(), (err) => {
+		const bookContent = parser(book, text);
+		fs.writeFile(`./books/${bookId}.json`, JSON.stringify(bookContent), (err) => {
 			if (err) throw err;
 			console.log('The file has been saved!');
 		});

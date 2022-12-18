@@ -7,10 +7,6 @@
 		<li><a href="/about">About</a></li>	
 	</ol>
 	<h1>Bieb</h1>
-	<ol>
-		<li><a href="https://github.com/hehk/bieb">Github</a></li>
-		<li><a href="/collections">Collections</a></li>	
-	</ol>
 </header>
 
 <style>

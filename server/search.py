@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from transformers import AutoTokenizer, AutoModel
+import json
 import torch
 import os
 from dotenv import dotenv_values
@@ -24,13 +25,6 @@ def generate_embeddings(paragraphs):
   sentence_embeddings = mean_pooling(model_output, encoded_input['attention_mask'])
   return sentence_embeddings
 
-def load_book(path):
-  with open(path, 'r') as f:
-    return f.read().strip()
-
-def parse_book(book):
-  return [line.strip().replace('\n', ' ') for line in book.split('\n\n') if line.strip()]
-
 def get_book_embeddings(book_id, content):
   file_name = f'books/embeddings_{book_id}.pt'
   embeddings = torch.zeros((0, 384))
@@ -47,22 +41,38 @@ def get_book_embeddings(book_id, content):
 
 books = []
 def load_book(book_id):
-  with open(f'books/{book_id}.txt', 'r') as f:
-    content = parse_book(f.read().strip())
-  embeddings = get_book_embeddings(book_id, content)
-  book = dict(id=book_id, content=content, embeddings=embeddings)
+  with open(f'books/{book_id}.json', 'r') as f:
+    book = json.load(f)
+  embeddings = get_book_embeddings(book_id, book["content"])
+  book["embeddings"] = embeddings
   books.append(book)
+
+def stretch_embeddings(embeddings, length):
+  new_embed = torch.zeros((length, embeddings.shape[1]))
+  new_embed[:embeddings.shape[0], :] = embeddings
+  return new_embed
 
 def search_books(query, books):
   query_embeddings = generate_embeddings([query])
   # The embeddings should stretch to fit any book
-  books_embedding = torch.stack([book['embeddings'] for book in books])
+  books_embedding = torch.stack([stretch_embeddings(book['embeddings'], 8000) for book in books])
   book_length = books_embedding.shape[1]
   distances = torch.nn.functional.cosine_similarity(query_embeddings, books_embedding, dim=2)
   top_distances = torch.topk(torch.flatten(distances), k=10).indices
-  return [books[i // book_length]["content"][i % book_length] for i in top_distances]
+  results = []
+  for i in top_distances:
+    book_index = i // book_length
+    book = books[book_index]
+    content = books[book_index]["content"][i % book_length]
+    results.append(dict(book=book["id"], content=content, title=book["title"], shortTitle=book["shortTitle"], link=book['link'], authors=book["authors"]))
+    
+  return results
 
-load_book('2701')
+dir_list = os.listdir('books')
+for file in dir_list:
+  if file.endswith('.json'):
+    load_book(file.split('.')[0])
+
 app = FastAPI()
 
 origins = [
@@ -70,8 +80,6 @@ origins = [
     f"http://localhost:{env['MODEL_PORT']}",
     f"http://localhost:{env['CLIENT_PORT']}"
 ]
-
-print(origins)
 
 app.add_middleware(
     CORSMiddleware,
@@ -81,10 +89,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
-  
 class Search(BaseModel):
   query: str
 

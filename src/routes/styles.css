@@ -41,19 +41,17 @@ p {
 
 a {
 	color: var(--color-text);
-	text-decoration: none;
+	text-decoration-thickness: 2px;
+	text-underline-offset: 2px;
 }
 
 a:hover {
 	text-decoration: underline;
 	text-decoration-color: var(--color-theme-2);
-	text-decoration-thickness: 4px;
-	text-underline-offset: 4px;
 }
 
 h1 {
 	font-size: 2rem;
-	text-align: center;
 	font-family: var(--font-serif);
 }
 
