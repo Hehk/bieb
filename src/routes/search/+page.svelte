@@ -1,28 +1,11 @@
 <script>
 	import Icon from '@iconify/svelte';
 
-	$: results = []
-	
-	const onSubmit = async (e) => {
-		const formData = new FormData(e.target)
-		const search = formData.get('search')
-		if (!search) return
+	/** @type {import('./$types').LayoutServerLoad} */
+	export let data
+	export let form
 
-		console.log(search)
-		try {
-			const response = await fetch('http://localhost:8000/search', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({ query: search })
-			})
-			const json = await response.json()
-			results = json.results
-		} catch (e) {
-			console.error(e)
-		}
-	}
+	const { quotes, query } = data
 </script>
 
 <svelte:head>
@@ -31,21 +14,21 @@
 </svelte:head>
 
 <section>
-	<form on:submit|preventDefault={onSubmit}>
-		<input type="text" name="search" id="search" />
+	<form>
+		<input type="text" name="query" id="query" value={query} />
 		<div class="search-icon">
 			<Icon icon="uil:search" />
 		</div>
 	</form>
 	
-	{#if results.length === 0}
+	{#if quotes.length === 0}
 		<p>Search for a book</p>
 	{:else}
-		<ol>{#each results as result}
+		<ol>{#each quotes as quote}
 			<li>
-				<p class="quote">{result.content}</p>
-				<div class="book-link"><span>Book: </span><a href="{result.link}">{result.shortTitle}</a></div>
-				<div>Authors: {result.authors.join(', ')}</div>
+				<p class="quote">{quote.content}</p>
+				<div class="book-link"><span>Book: </span><a href="{quote.link}">{quote.shortTitle}</a></div>
+				<div>Authors: {quote.authors.join(', ')}</div>
 			</li>
 		{/each}</ol>
 	{/if}

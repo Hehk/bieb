@@ -1,28 +1,6 @@
 <script>
 	import Icon from '@iconify/svelte';
-
-	$: results = []
-	
-	const onSubmit = async (e) => {
-		const formData = new FormData(e.target)
-		const search = formData.get('search')
-		if (!search) return
-
-		console.log(search)
-		try {
-			const response = await fetch('http://localhost:8000/search', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({ query: search })
-			})
-			const json = await response.json()
-			results = json.results
-		} catch (e) {
-			console.error(e)
-		}
-	}
+	import Header from './Header.svelte';
 </script>
 
 <svelte:head>
@@ -30,31 +8,22 @@
 	<meta name="description" content="Search the world of open books!" />
 </svelte:head>
 
+<Header />
+
 <section>
-	<form on:submit|preventDefault={onSubmit}>
-		<input type="text" name="search" id="search" />
+	<form action="/search">
+		<input type="text" name="query" id="query" />
 		<div class="search-icon">
 			<Icon icon="uil:search" />
 		</div>
 	</form>
-	
-	{#if results.length === 0}
-		<p>Search for a book</p>
-	{:else}
-		<ol>{#each results as result}
-			<li>
-				<p class="quote">{result.content}</p>
-				<div class="book-link"><span>Book: </span><a href="{result.link}">{result.shortTitle}</a></div>
-				<div>Authors: {result.authors.join(', ')}</div>
-			</li>
-		{/each}</ol>
-	{/if}
-		
 </section>
 
 <style>
 	section {
-		padding: 0 4rem;
+		width: 100%;
+		max-width: var(--container-width);
+		margin: 0 auto;
 	}
 
 	form {

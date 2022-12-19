@@ -102,5 +102,5 @@ def search(search: Search):
   return response
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", port=int(env['MODEL_PORT']))
+    uvicorn.run("search:app", port=int(env['MODEL_PORT']))
   

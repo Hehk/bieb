@@ -16,6 +16,7 @@
 	color: var(--color-text);
 	
 	--container-width: 48rem;
+	--container-wide-width: 64rem;
 }
 
 body {
