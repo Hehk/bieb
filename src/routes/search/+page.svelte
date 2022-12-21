@@ -1,10 +1,8 @@
-<script>
+<script lang="ts">
 	import Icon from '@iconify/svelte';
+	import type { PageData } from '../$types';
 
-	/** @type {import('./$types').LayoutServerLoad} */
-	export let data
-	export let form
-
+	export let data : PageData;
 	const { quotes, query } = data
 </script>
 

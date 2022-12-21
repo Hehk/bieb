@@ -6,7 +6,12 @@ const getQuery = (url: URL) => {
     if (query) return query
 }
 
-export async function load({ url }: PageLoad) {
+type Response = {
+    quotes: string[]
+    query?: string
+}
+
+export const load = (async ({ url }) : Promise<Response> => {
     const query = getQuery(url)
     let quotes = []
     if (query) {
@@ -17,4 +22,4 @@ export async function load({ url }: PageLoad) {
         quotes,
         query
     }
-}
+}) satisfies PageLoad<Response>
