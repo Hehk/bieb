@@ -105,13 +105,31 @@ function formatAuthor(author) {
 	return name;
 }
 
+const getDownloadLink = (metadata) => {
+	const formats = [
+		'text/plain; charset=utf-8',
+		'text/plain;',
+		'text/plain; charset=us-ascii',
+		'text/plain'
+	];
+	const format = formats.find((f) => f in metadata.formats);
+	if (!format)
+		throw new Response(
+			JSON.stringify({
+				message: 'No supported format found'
+			}),
+			{ status: 500, headers: { 'Content-Type': 'application/json' } }
+		);
+
+	return metadata.formats[format];
+};
+
 async function downloadGutenbergBook(book) {
-	const bookResponse = await fetch(
-		`https://www.gutenberg.org/files/${book.source_id}/${book.source_id}-0.txt`
-	);
-	const rawBook = await bookResponse.text();
 	const metadataResponse = await fetch(`https://gutendex.com/books/${book.source_id}`);
 	const metadata = await metadataResponse.json();
+	const downloadLink = getDownloadLink(metadata);
+	const bookResponse = await fetch(downloadLink);
+	const rawBook = await bookResponse.text();
 
 	return {
 		id: metadata.id,
@@ -185,7 +203,9 @@ async function insertBookContent(supabase, bookContent, bookId) {
 serve(async (req: Request) => {
 	try {
 		const supabase = createSupabaseClient();
-		const { bookId } = await req.json();
+		const json = await req.json();
+		const { record } = json;
+		const bookId = record.id;
 		const book = await fetchBook(supabase, bookId);
 		const bookContent = await downloadBook(book);
 		await insertBookContent(supabase, bookContent, bookId);
